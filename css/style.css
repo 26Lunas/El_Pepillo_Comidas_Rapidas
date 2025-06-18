@@ -87,3 +87,52 @@ body{
     right: -15px;
 
 }
+.pedido-card-img {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 3px solid var(--colorNaranjaClaro);
+    background: #fff;
+}
+#pedidoCardNombre {
+    font-size: 1.3rem;
+    color: #222;
+}
+#pedidoCardPrecio {
+    font-size: 1.1rem;
+}
+#pedidoCardComentarios {
+    font-style: italic;
+}
+#pedidoCardAdicionales {
+    font-size: 1rem;
+    color: #444;
+}
+#pedidoCardTotal {
+    font-size: 1.2rem;
+    color: #28a745;
+}
+#formPedido .form-label {
+    font-weight: 500;
+    color: #f79b3e;
+}
+#formPedido .form-control-lg {
+    font-size: 1.1rem;
+    border-radius: 2rem;
+    border: 1.5px solid #f79b3e;
+}
+#formPedido textarea.form-control {
+    min-height: 48px;
+    border-radius: 1.2rem;
+    border: 1.5px solid #f79b3e;
+}
+#formPedido .btn-success {
+    background: linear-gradient(90deg, #f79b3e 60%, #fd5035 100%);
+    border: none;
+    font-size: 1.2rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+#formPedido .btn-success:hover {
+    background: linear-gradient(90deg, #fd5035 60%, #f79b3e 100%);
+    color: #fff;
+}

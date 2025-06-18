@@ -46,6 +46,7 @@
                         <p class="text-muted">Precio: $10.000</p>
                     </div>
                     <img src="images/img-salchipapas.png" class="img-fluid" alt="Salchipapas">
+                    <button class="btn btn-primary mt-auto btn-pedir" data-producto="Salchipapas" data-precio="10000" data-img="images/img-salchipapas.png">Pedir</button>
                 </div>
                 <div class="col-6 col-md-2 card-product">
                     <div class="text-product">
@@ -53,6 +54,7 @@
                         <p class="text-muted">Precio: $5.000</p>
                     </div>
                     <img src="images/img-perro-caliente.png" class="img-fluid" alt="Perro Caliente">
+                    <button class="btn btn-primary mt-auto btn-pedir" data-producto="Perros Calientes" data-precio="5000" data-img="images/img-perro-caliente.png">Pedir</button>
                 </div>
                 <div class="col-6 col-md-2 card-product">
                     <div class="text-product">
@@ -60,6 +62,7 @@
                         <p class="text-muted">Precio: $12.000</p>
                     </div>
                     <img src="images/hamburguesa.png" class="img-fluid img-hamburguesa" alt="Hamburguesas">
+                    <button class="btn btn-primary mt-auto btn-pedir" data-producto="Hamburguesas" data-precio="12000" data-img="images/hamburguesa.png">Pedir</button>
                 </div>
                 <div class="col-6 col-md-2 card-product">
                     <div class="text-product">
@@ -67,6 +70,7 @@
                         <p class="text-muted">Precio $20.000</p>
                     </div>
                     <img src="images/asados.png" class="img-fluid img-asados" alt="Asados">
+                    <button class="btn btn-primary mt-auto btn-pedir" data-producto="Asados" data-precio="20000" data-img="images/asados.png">Pedir</button>
                 </div>
             </div>
         </section>
@@ -135,7 +139,7 @@
                                 </div>
                             </div>
                             <p class="mt-2">⭐️⭐️⭐️⭐️⭐️
-                                "Primera vez que pruebo una ‘salbajada’ y quedé feliz. Es como una bomba de todo lo que
+                                "Primera vez que pruebo una 'salbajada' y quedé feliz. Es como una bomba de todo lo que
                                 me gusta 😂. Perfecta para cuando uno tiene mucha hambre.</p>
                         </div>
                     </div>
@@ -154,6 +158,67 @@
     </div>
     <div class="footer" id="footer"></div>
 
+    <!-- Modal Pedido -->
+    <div class="modal fade" id="modalPedido" tabindex="-1" aria-labelledby="modalPedidoLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalPedidoLabel">Realizar Pedido</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Tarjeta visual del producto -->
+                    <div id="pedidoCard" class="card mb-4 shadow-sm border-0 text-center d-none">
+                        <div class="card-body">
+                            <img id="pedidoCardImg" src="" alt="Producto" class="rounded mb-2 pedido-card-img" style="width:110px;height:110px;object-fit:cover;">
+                            <h5 id="pedidoCardNombre" class="fw-bold mb-1"></h5>
+                            <p id="pedidoCardPrecio" class="text-primary fw-bold mb-1"></p>
+                            <div id="pedidoCardAdicionales" class="mb-1 d-none"><span class="fw-bold">Adicionales:</span> <span id="pedidoCardAdicionalesList"></span></div>
+                            <p id="pedidoCardComentarios" class="text-muted small mb-0 d-none"></p>
+                            <p id="pedidoCardTotal" class="fw-bold mt-2 mb-0 text-success"></p>
+                        </div>
+                    </div>
+                    <!-- Formulario de datos del cliente -->
+                    <form id="formPedido">
+                        <div class="row g-2 mb-3">
+                            <div class="col-12">
+                                <label class="form-label">Adicionales <i class="fa-solid fa-plus"></i></label>
+                                <div class="form-check">
+                                    <input class="form-check-input adicionales-check" type="checkbox" value="Gratinado" data-precio="5000" id="adicionalGratinado">
+                                    <label class="form-check-label" for="adicionalGratinado">Gratinado <span class="text-primary">$5.000</span></label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input adicionales-check" type="checkbox" value="Aguacate" data-precio="5000" id="adicionalAguacate">
+                                    <label class="form-check-label" for="adicionalAguacate">Aguacate <span class="text-primary">$5.000</span></label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Nombre <i class="fa-solid fa-user"></i></label>
+                                <input type="text" class="form-control form-control-lg rounded-pill" id="pedidoNombre" required placeholder="Tu nombre completo">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Celular <i class="fa-solid fa-phone"></i></label>
+                                <input type="text" class="form-control form-control-lg rounded-pill" id="pedidoCelular" required placeholder="Ej: 3001234567">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Dirección <i class="fa-solid fa-location-dot"></i></label>
+                                <input type="text" class="form-control form-control-lg rounded-pill" id="pedidoDireccion" required placeholder="¿A dónde llevamos tu pedido?">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Comentarios <i class="fa-solid fa-pen"></i></label>
+                                <textarea class="form-control rounded-4" id="pedidoComentarios" rows="2" placeholder="¿Algo especial para tu pedido?"></textarea>
+                            </div>
+                        </div>
+                        <input type="hidden" id="pedidoProducto">
+                        <input type="hidden" id="pedidoPrecio">
+                        <input type="hidden" id="pedidoImg">
+                        <button type="submit" class="btn btn-success w-100 btn-lg rounded-pill mt-2">Pedir <i class="fa-brands fa-whatsapp"></i></button>
+                    </form>
+                    <div id="pedidoConfirmacion" class="alert alert-success mt-3 d-none text-center"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Bootstrap v5.3 -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
