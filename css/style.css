@@ -19,7 +19,7 @@ body{
     background: var(--colorCrisFondo);
 }
 .img-main{
-    width: 50%;
+    width: 400px;
     height: 50%;
 }
 .text-salchipapa{
@@ -61,15 +61,15 @@ body{
     height: 100px;
     position: relative;
     top: -40px;
-    right: -5px;
+    right: -10px;
     /* border-radius: 50%; */
     object-fit: cover;
 }
 .card-product .img-hamburguesa{
-    width: 150px;
-    height: 150px;
+    width: 120px;
+    height: 120px;
     position: relative;
-    top: -65px;
+    top: -45px;
 
 }
 .card-product .img-asados{
