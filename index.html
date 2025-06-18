@@ -43,34 +43,62 @@
                 <div class="col-6 col-md-2 card-product">
                     <div class="text-product">
                         <p class="fw-bold">Salchipapas</p>
-                        <p class="text-muted">Precio: $10.000</p>
+                        <p class="text-muted">Desde: $10.000</p>
                     </div>
                     <img src="images/img-salchipapas.png" class="img-fluid" alt="Salchipapas">
-                    <button class="btn btn-primary mt-auto btn-pedir" data-producto="Salchipapas" data-precio="10000" data-img="images/img-salchipapas.png">Pedir</button>
+                    <button class="btn btn-primary mt-auto btn-pedir" 
+                        data-producto="Salchipapas" 
+                        data-precio="10000" 
+                        data-img="images/img-salchipapas.png"
+                        data-variantes='[
+                            {"nombre": "Salchipapa Regular", "precio": 10000},
+                            {"nombre": "Salchipapa Combinada", "precio": 15000}
+                        ]'>Pedir</button>
                 </div>
                 <div class="col-6 col-md-2 card-product">
                     <div class="text-product">
                         <p class="fw-bold">Perros Calientes</p>
-                        <p class="text-muted">Precio: $5.000</p>
+                        <p class="text-muted">Desde: $5.000</p>
                     </div>
                     <img src="images/img-perro-caliente.png" class="img-fluid" alt="Perro Caliente">
-                    <button class="btn btn-primary mt-auto btn-pedir" data-producto="Perros Calientes" data-precio="5000" data-img="images/img-perro-caliente.png">Pedir</button>
+                    <button class="btn btn-primary mt-auto btn-pedir" 
+                        data-producto="Perros Calientes" 
+                        data-precio="5000" 
+                        data-img="images/img-perro-caliente.png"
+                        data-variantes='[
+                            {"nombre": "Perro Sencillo", "precio": 5000},
+                            {"nombre": "Perro Especial", "precio": 8000}
+                        ]'>Pedir</button>
                 </div>
                 <div class="col-6 col-md-2 card-product">
                     <div class="text-product">
                         <p class="fw-bold">Hamburguesas</p>
-                        <p class="text-muted">Precio: $12.000</p>
+                        <p class="text-muted">Desde: $12.000</p>
                     </div>
                     <img src="images/hamburguesa.png" class="img-fluid img-hamburguesa" alt="Hamburguesas">
-                    <button class="btn btn-primary mt-auto btn-pedir" data-producto="Hamburguesas" data-precio="12000" data-img="images/hamburguesa.png">Pedir</button>
+                    <button class="btn btn-primary mt-auto btn-pedir" 
+                        data-producto="Hamburguesas" 
+                        data-precio="12000" 
+                        data-img="images/hamburguesa.png"
+                        data-variantes='[
+                            {"nombre": "Hamburguesa de Carne", "precio": 12000},
+                            {"nombre": "Hamburguesa de Pollo", "precio": 12000}
+                        ]'>Pedir</button>
                 </div>
                 <div class="col-6 col-md-2 card-product">
                     <div class="text-product">
                         <p class="fw-bold">Asados</p>
-                        <p class="text-muted">Precio $20.000</p>
+                        <p class="text-muted">Desde: $20.000</p>
                     </div>
                     <img src="images/asados.png" class="img-fluid img-asados" alt="Asados">
-                    <button class="btn btn-primary mt-auto btn-pedir" data-producto="Asados" data-precio="20000" data-img="images/asados.png">Pedir</button>
+                    <button class="btn btn-primary mt-auto btn-pedir" 
+                        data-producto="Asados" 
+                        data-precio="20000" 
+                        data-img="images/asados.png"
+                        data-variantes='[
+                            {"nombre": "Asado de Carne", "precio": 20000},
+                            {"nombre": "Asado de Pollo", "precio": 18000}
+                        ]'>Pedir</button>
                 </div>
             </div>
         </section>
@@ -172,8 +200,16 @@
                         <div class="card-body">
                             <img id="pedidoCardImg" src="" alt="Producto" class="rounded mb-2 pedido-card-img" style="width:110px;height:110px;object-fit:cover;">
                             <h5 id="pedidoCardNombre" class="fw-bold mb-1"></h5>
+                            <div class="mb-3">
+                                <select class="form-select form-select-lg mb-2" id="pedidoVariante" required>
+                                    <option value="">Selecciona una opción</option>
+                                </select>
+                            </div>
                             <p id="pedidoCardPrecio" class="text-primary fw-bold mb-1"></p>
-                            <div id="pedidoCardAdicionales" class="mb-1 d-none"><span class="fw-bold">Adicionales:</span> <span id="pedidoCardAdicionalesList"></span></div>
+                            <div id="pedidoCardAdicionales" class="mb-1 d-none">
+                                <span class="fw-bold">Adicionales:</span> 
+                                <span id="pedidoCardAdicionalesList"></span>
+                            </div>
                             <p id="pedidoCardComentarios" class="text-muted small mb-0 d-none"></p>
                             <p id="pedidoCardTotal" class="fw-bold mt-2 mb-0 text-success"></p>
                         </div>

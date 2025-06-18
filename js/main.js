@@ -23,8 +23,12 @@ document.addEventListener("DOMContentLoaded", function (){
     function actualizarTarjetaPedido() {
         // Producto base
         const nombre = productoActual.nombre;
-        const precioBase = Number(productoActual.precio);
+        const varianteSelect = document.getElementById('pedidoVariante');
+        const varianteSeleccionada = varianteSelect.value ? JSON.parse(varianteSelect.value) : null;
+        const precioBase = varianteSeleccionada ? varianteSeleccionada.precio : Number(productoActual.precio);
+        const nombreCompleto = varianteSeleccionada ? varianteSeleccionada.nombre : nombre;
         const img = productoActual.img;
+
         // Adicionales
         const checks = document.querySelectorAll('.adicionales-check:checked');
         let adicionales = [];
@@ -33,12 +37,16 @@ document.addEventListener("DOMContentLoaded", function (){
             adicionales.push(chk.value);
             adicionalesTotal += Number(chk.getAttribute('data-precio'));
         });
+
         // Comentarios
         const comentarios = document.getElementById('pedidoComentarios').value.trim();
+
         // Mostrar en tarjeta
         document.getElementById('pedidoCardImg').src = img;
         document.getElementById('pedidoCardNombre').textContent = nombre;
-        document.getElementById('pedidoCardPrecio').textContent = '$' + precioBase.toLocaleString();
+        document.getElementById('pedidoCardPrecio').textContent = varianteSeleccionada ? 
+            '$' + precioBase.toLocaleString() : 'Selecciona una opción';
+
         // Adicionales en tarjeta
         if (adicionales.length > 0) {
             document.getElementById('pedidoCardAdicionales').classList.remove('d-none');
@@ -47,6 +55,7 @@ document.addEventListener("DOMContentLoaded", function (){
             document.getElementById('pedidoCardAdicionales').classList.add('d-none');
             document.getElementById('pedidoCardAdicionalesList').textContent = '';
         }
+
         // Comentarios en tarjeta
         if (comentarios) {
             document.getElementById('pedidoCardComentarios').textContent = comentarios;
@@ -55,13 +64,23 @@ document.addEventListener("DOMContentLoaded", function (){
             document.getElementById('pedidoCardComentarios').textContent = '';
             document.getElementById('pedidoCardComentarios').classList.add('d-none');
         }
+
         // Precio total
         const total = precioBase + adicionalesTotal;
-        document.getElementById('pedidoCardTotal').textContent = 'Total: $' + total.toLocaleString();
+        document.getElementById('pedidoCardTotal').textContent = varianteSeleccionada ? 
+            'Total: $' + total.toLocaleString() : '';
+
         // Guardar en campos ocultos
-        document.getElementById('pedidoProducto').value = nombre;
+        document.getElementById('pedidoProducto').value = nombreCompleto;
         document.getElementById('pedidoPrecio').value = total;
         document.getElementById('pedidoImg').value = img;
+
+        // Habilitar/deshabilitar formulario según selección
+        const form = document.getElementById('formPedido');
+        const inputs = form.querySelectorAll('input, textarea, button');
+        inputs.forEach(input => {
+            input.disabled = !varianteSeleccionada;
+        });
     }
 
     document.body.addEventListener('click', function(e) {
@@ -70,8 +89,17 @@ document.addEventListener("DOMContentLoaded", function (){
             productoActual = {
                 nombre: btn.getAttribute('data-producto'),
                 precio: btn.getAttribute('data-precio'),
-                img: btn.getAttribute('data-img')
+                img: btn.getAttribute('data-img'),
+                variantes: JSON.parse(btn.getAttribute('data-variantes'))
             };
+
+            // Llenar select de variantes
+            const varianteSelect = document.getElementById('pedidoVariante');
+            varianteSelect.innerHTML = '<option value="">Selecciona una opción</option>';
+            productoActual.variantes.forEach(variante => {
+                varianteSelect.innerHTML += `<option value='${JSON.stringify(variante)}'>${variante.nombre} - $${variante.precio.toLocaleString()}</option>`;
+            });
+
             document.getElementById('formPedido').reset();
             document.getElementById('pedidoConfirmacion').classList.add('d-none');
             document.querySelectorAll('.adicionales-check').forEach(chk => chk.checked = false);
@@ -81,7 +109,8 @@ document.addEventListener("DOMContentLoaded", function (){
         }
     });
 
-    // Actualizar tarjeta al cambiar adicionales o comentarios
+    // Actualizar tarjeta al cambiar variante, adicionales o comentarios
+    document.getElementById('pedidoVariante').addEventListener('change', actualizarTarjetaPedido);
     document.querySelectorAll('.adicionales-check').forEach(chk => {
         chk.addEventListener('change', actualizarTarjetaPedido);
     });
@@ -96,10 +125,12 @@ document.addEventListener("DOMContentLoaded", function (){
         const producto = document.getElementById('pedidoProducto').value;
         const precio = document.getElementById('pedidoPrecio').value;
         const img = document.getElementById('pedidoImg').value;
+
         // Adicionales
         const checks = document.querySelectorAll('.adicionales-check:checked');
         let adicionales = [];
         checks.forEach(chk => adicionales.push(chk.value));
+
         // Mensaje
         let mensaje = `¡Hola! Quiero pedir:\n\n`;
         mensaje += `*Producto:* ${producto}\n`;
@@ -110,10 +141,12 @@ document.addEventListener("DOMContentLoaded", function (){
         mensaje += `Nombre: ${nombre}\n`;
         mensaje += `Celular: ${celular}\n`;
         mensaje += `Dirección: ${direccion}`;
+
         // WhatsApp API
         const numero = '573152854277';
         const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
         window.open(url, '_blank');
+
         // Mostrar confirmación
         const confirmacion = document.getElementById('pedidoConfirmacion');
         confirmacion.innerHTML = `<strong>¡Pedido enviado!</strong><br><img src="${img}" alt="${producto}" style="width:80px;display:block;margin:10px auto;"/><br>${producto} - $${Number(precio).toLocaleString()}<br>Gracias, ${nombre}. Nos contactaremos pronto.`;
