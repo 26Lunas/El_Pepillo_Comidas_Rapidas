@@ -1,158 +1,138 @@
-document.addEventListener("DOMContentLoaded", function (){
-    fetch("components/navbar.html")
-        .then(response => response.text())
-        .then(data =>{
-            document.getElementById("menu-nav").innerHTML = data;
-        })
-        .catch(error => console.error("Error cargando el componentes:", error));
-    
-    fetch("components/footer.html")
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById("footer").innerHTML = data;
-        })
-        .catch(error => console.error("Error cargando el footer:", error));
+document.addEventListener("DOMContentLoaded", function () {
 
-    // Lógica para el modal de pedido
-    let modalPedido = null;
-    if (window.bootstrap) {
-        modalPedido = new bootstrap.Modal(document.getElementById('modalPedido'));
-    }
-    let productoActual = {};
-
-    function actualizarTarjetaPedido() {
-        // Producto base
-        const nombre = productoActual.nombre;
-        const varianteSelect = document.getElementById('pedidoVariante');
-        const varianteSeleccionada = varianteSelect.value ? JSON.parse(varianteSelect.value) : null;
-        const precioBase = varianteSeleccionada ? varianteSeleccionada.precio : Number(productoActual.precio);
-        const nombreCompleto = varianteSeleccionada ? varianteSeleccionada.nombre : nombre;
-        const img = productoActual.img;
-
-        // Adicionales
-        const checks = document.querySelectorAll('.adicionales-check:checked');
-        let adicionales = [];
-        let adicionalesTotal = 0;
-        checks.forEach(chk => {
-            adicionales.push(chk.value);
-            adicionalesTotal += Number(chk.getAttribute('data-precio'));
-        });
-
-        // Comentarios
-        const comentarios = document.getElementById('pedidoComentarios').value.trim();
-
-        // Mostrar en tarjeta
-        document.getElementById('pedidoCardImg').src = img;
-        document.getElementById('pedidoCardNombre').textContent = nombre;
-        document.getElementById('pedidoCardPrecio').textContent = varianteSeleccionada ? 
-            '$' + precioBase.toLocaleString() : 'Selecciona una opción';
-
-        // Adicionales en tarjeta
-        if (adicionales.length > 0) {
-            document.getElementById('pedidoCardAdicionales').classList.remove('d-none');
-            document.getElementById('pedidoCardAdicionalesList').textContent = adicionales.join(', ');
-        } else {
-            document.getElementById('pedidoCardAdicionales').classList.add('d-none');
-            document.getElementById('pedidoCardAdicionalesList').textContent = '';
-        }
-
-        // Comentarios en tarjeta
-        if (comentarios) {
-            document.getElementById('pedidoCardComentarios').textContent = comentarios;
-            document.getElementById('pedidoCardComentarios').classList.remove('d-none');
-        } else {
-            document.getElementById('pedidoCardComentarios').textContent = '';
-            document.getElementById('pedidoCardComentarios').classList.add('d-none');
-        }
-
-        // Precio total
-        const total = precioBase + adicionalesTotal;
-        document.getElementById('pedidoCardTotal').textContent = varianteSeleccionada ? 
-            'Total: $' + total.toLocaleString() : '';
-
-        // Guardar en campos ocultos
-        document.getElementById('pedidoProducto').value = nombreCompleto;
-        document.getElementById('pedidoPrecio').value = total;
-        document.getElementById('pedidoImg').value = img;
-
-        // Habilitar/deshabilitar formulario según selección
-        const form = document.getElementById('formPedido');
-        const inputs = form.querySelectorAll('input, textarea, button');
-        inputs.forEach(input => {
-            input.disabled = !varianteSeleccionada;
-        });
-    }
-
-    document.body.addEventListener('click', function(e) {
-        if (e.target.classList.contains('btn-pedir')) {
-            const btn = e.target;
-            productoActual = {
-                nombre: btn.getAttribute('data-producto'),
-                precio: btn.getAttribute('data-precio'),
-                img: btn.getAttribute('data-img'),
-                variantes: JSON.parse(btn.getAttribute('data-variantes'))
-            };
-
-            // Llenar select de variantes
-            const varianteSelect = document.getElementById('pedidoVariante');
-            varianteSelect.innerHTML = '<option value="">Selecciona una opción</option>';
-            productoActual.variantes.forEach(variante => {
-                varianteSelect.innerHTML += `<option value='${JSON.stringify(variante)}'>${variante.nombre} - $${variante.precio.toLocaleString()}</option>`;
+    const fetchComponent = (url, elementId) => {
+        return fetch(url)
+            .then(response => {
+                if (!response.ok) throw new Error(`Error al cargar ${url}`);
+                return response.text();
+            })
+            .then(data => {
+                const element = document.getElementById(elementId);
+                if (element) element.innerHTML = data;
             });
+    };
 
-            document.getElementById('formPedido').reset();
-            document.getElementById('pedidoConfirmacion').classList.add('d-none');
-            document.querySelectorAll('.adicionales-check').forEach(chk => chk.checked = false);
-            document.getElementById('pedidoCard').classList.remove('d-none');
-            actualizarTarjetaPedido();
-            if (modalPedido) modalPedido.show();
+    const initModalLogic = () => {
+        let modalPedido = null;
+        if (window.bootstrap && document.getElementById('modalPedido')) {
+            modalPedido = new bootstrap.Modal(document.getElementById('modalPedido'));
         }
-    });
+        let productoActual = {};
 
-    // Actualizar tarjeta al cambiar variante, adicionales o comentarios
-    document.getElementById('pedidoVariante').addEventListener('change', actualizarTarjetaPedido);
-    document.querySelectorAll('.adicionales-check').forEach(chk => {
-        chk.addEventListener('change', actualizarTarjetaPedido);
-    });
-    document.getElementById('pedidoComentarios').addEventListener('input', actualizarTarjetaPedido);
+        function actualizarTarjetaPedido() {
+            const nombre = productoActual.nombre;
+            const varianteSelect = document.getElementById('pedidoVariante');
+            const varianteSeleccionada = varianteSelect.value ? JSON.parse(varianteSelect.value) : null;
+            const precioBase = varianteSeleccionada ? varianteSeleccionada.precio : Number(productoActual.precio);
+            const nombreCompleto = varianteSeleccionada ? varianteSeleccionada.nombre : nombre;
+            const img = productoActual.img;
+            const checks = document.querySelectorAll('.adicionales-check:checked');
+            let adicionales = [];
+            let adicionalesTotal = 0;
+            checks.forEach(chk => {
+                adicionales.push(chk.value);
+                adicionalesTotal += Number(chk.getAttribute('data-precio'));
+            });
+            const comentarios = document.getElementById('pedidoComentarios').value.trim();
+            document.getElementById('pedidoCardImg').src = img;
+            document.getElementById('pedidoCardNombre').textContent = nombre;
+            document.getElementById('pedidoCardPrecio').textContent = varianteSeleccionada ? '$' + precioBase.toLocaleString() : 'Selecciona una opción';
+            const adicionalesEl = document.getElementById('pedidoCardAdicionales');
+            if (adicionales.length > 0) {
+                adicionalesEl.classList.remove('d-none');
+                document.getElementById('pedidoCardAdicionalesList').textContent = adicionales.join(', ');
+            } else {
+                adicionalesEl.classList.add('d-none');
+            }
+            const comentariosEl = document.getElementById('pedidoCardComentarios');
+            if (comentarios) {
+                comentariosEl.textContent = comentarios;
+                comentariosEl.classList.remove('d-none');
+            } else {
+                comentariosEl.classList.add('d-none');
+            }
+            const total = precioBase + adicionalesTotal;
+            document.getElementById('pedidoCardTotal').textContent = varianteSeleccionada ? 'Total: $' + total.toLocaleString() : '';
+            document.getElementById('pedidoProducto').value = nombreCompleto;
+            document.getElementById('pedidoPrecio').value = total;
+            document.getElementById('pedidoImg').value = img;
+            const form = document.getElementById('formPedido');
+            form.querySelectorAll('input, textarea, button, select').forEach(input => {
+                input.disabled = !varianteSeleccionada;
+            });
+        }
 
-    document.getElementById('formPedido').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const nombre = document.getElementById('pedidoNombre').value;
-        const celular = document.getElementById('pedidoCelular').value;
-        const direccion = document.getElementById('pedidoDireccion').value;
-        const comentarios = document.getElementById('pedidoComentarios').value;
-        const producto = document.getElementById('pedidoProducto').value;
-        const precio = document.getElementById('pedidoPrecio').value;
-        const img = document.getElementById('pedidoImg').value;
+        document.body.addEventListener('click', function (e) {
+            if (e.target.classList.contains('btn-pedir')) {
+                const btn = e.target;
+                productoActual = {
+                    nombre: btn.getAttribute('data-producto'),
+                    precio: btn.getAttribute('data-precio'),
+                    img: btn.getAttribute('data-img'),
+                    variantes: JSON.parse(btn.getAttribute('data-variantes'))
+                };
+                const varianteSelect = document.getElementById('pedidoVariante');
+                varianteSelect.innerHTML = '<option value="">Selecciona una opción</option>';
+                productoActual.variantes.forEach(variante => {
+                    varianteSelect.innerHTML += `<option value='${JSON.stringify(variante)}'>${variante.nombre} - $${variante.precio.toLocaleString()}</option>`;
+                });
+                document.getElementById('formPedido').reset();
+                document.getElementById('pedidoConfirmacion').classList.add('d-none');
+                document.querySelectorAll('.adicionales-check').forEach(chk => chk.checked = false);
+                document.getElementById('pedidoCard').classList.remove('d-none');
+                actualizarTarjetaPedido();
+                if (modalPedido) modalPedido.show();
+            }
+        });
 
-        // Adicionales
-        const checks = document.querySelectorAll('.adicionales-check:checked');
-        let adicionales = [];
-        checks.forEach(chk => adicionales.push(chk.value));
+        document.body.addEventListener('change', e => {
+            if (e.target.id === 'pedidoVariante' || e.target.classList.contains('adicionales-check')) {
+                actualizarTarjetaPedido();
+            }
+        });
 
-        // Mensaje
-        let mensaje = `¡Hola! Quiero pedir:\n\n`;
-        mensaje += `*Producto:* ${producto}\n`;
-        if (adicionales.length > 0) mensaje += `*Adicionales:* ${adicionales.join(', ')}\n`;
-        mensaje += `*Total a pagar:* $${Number(precio).toLocaleString()}\n`;
-        if (comentarios) mensaje += `*Comentarios:* ${comentarios}\n`;
-        mensaje += `\n*Datos de entrega:*\n`;
-        mensaje += `Nombre: ${nombre}\n`;
-        mensaje += `Celular: ${celular}\n`;
-        mensaje += `Dirección: ${direccion}`;
+        document.body.addEventListener('input', e => {
+            if (e.target.id === 'pedidoComentarios') {
+                actualizarTarjetaPedido();
+            }
+        });
 
-        // WhatsApp API
-        const numero = '573152854277';
-        const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
-        window.open(url, '_blank');
+        document.body.addEventListener('submit', function (e) {
+            if (e.target.id === 'formPedido') {
+                e.preventDefault();
+                const nombre = document.getElementById('pedidoNombre').value;
+                const celular = document.getElementById('pedidoCelular').value;
+                const direccion = document.getElementById('pedidoDireccion').value;
+                const comentarios = document.getElementById('pedidoComentarios').value;
+                const producto = document.getElementById('pedidoProducto').value;
+                const precio = document.getElementById('pedidoPrecio').value;
+                const checks = document.querySelectorAll('.adicionales-check:checked');
+                let adicionales = [];
+                checks.forEach(chk => adicionales.push(chk.value));
+                let mensaje = `¡Hola! Quiero pedir:\n\n*Producto:* ${producto}\n`;
+                if (adicionales.length > 0) mensaje += `*Adicionales:* ${adicionales.join(', ')}\n`;
+                mensaje += `*Total a pagar:* $${Number(precio).toLocaleString()}\n`;
+                if (comentarios) mensaje += `*Comentarios:* ${comentarios}\n`;
+                mensaje += `\n*Datos de entrega:*\nNombre: ${nombre}\nCelular: ${celular}\nDirección: ${direccion}`;
+                const numero = '573152854277';
+                const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
+                window.open(url, '_blank');
+                const confirmacion = document.getElementById('pedidoConfirmacion');
+                confirmacion.innerHTML = `<strong>¡Pedido enviado!</strong><br><img src="${productoActual.img}" alt="${producto}" style="width:80px;display:block;margin:10px auto;"/><br>${producto} - $${Number(precio).toLocaleString()}<br>Gracias, ${nombre}. Nos contactaremos pronto.`;
+                confirmacion.classList.remove('d-none');
+                setTimeout(() => {
+                    if (modalPedido) modalPedido.hide();
+                }, 3000);
+            }
+        });
+    };
 
-        // Mostrar confirmación
-        const confirmacion = document.getElementById('pedidoConfirmacion');
-        confirmacion.innerHTML = `<strong>¡Pedido enviado!</strong><br><img src="${img}" alt="${producto}" style="width:80px;display:block;margin:10px auto;"/><br>${producto} - $${Number(precio).toLocaleString()}<br>Gracias, ${nombre}. Nos contactaremos pronto.`;
-        confirmacion.classList.remove('d-none');
-        setTimeout(() => {
-            if (modalPedido) modalPedido.hide();
-        }, 3000);
-    });
+    Promise.all([
+        fetchComponent('components/navbar.html', 'menu-nav'),
+        fetchComponent('components/footer.html', 'footer'),
+        fetchComponent('components/modal.html', 'modal-container')
+    ])
+    .then(initModalLogic)
+    .catch(error => console.error("Error al inicializar la página:", error));
+
 });

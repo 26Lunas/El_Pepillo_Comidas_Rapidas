@@ -92,6 +92,10 @@ body{
     border: 3px solid var(--colorNaranjaClaro);
     background: #fff;
 }
+.card-product .btn-pedir{
+    position: relative;
+    left: -35px;
+}
 #pedidoCardNombre {
     font-size: 1.3rem;
     color: #222;
