@@ -44,20 +44,39 @@ body{
 }
 .card-product{
     border-radius: 15px;
-    box-shadow: #8f8f8f 1px 1px 2px;
     display: flex;
     background: white;
     padding: 15px;
     min-width: 200px;
+    height: 125px;
     margin-bottom: 20px;
 }
+
 .card-product p{
     margin: 0;
 }
 .card-product img{
-    width: 95px;
-    height: 95px;
+    /* border: solid 1px #8f8f8f; */
+    width: 100px;
+    height: 100px;
     position: relative;
-    top: -20px;
+    top: -40px;
     right: -5px;
+    /* border-radius: 50%; */
+    object-fit: cover;
+}
+.card-product .img-hamburguesa{
+    width: 150px;
+    height: 150px;
+    position: relative;
+    top: -65px;
+
+}
+.card-product .img-asados{
+    width: 120px;
+    height: 120px;
+    position: relative;
+    top: -70px;
+    right: -15px;
+
 }
