@@ -1,9 +1,15 @@
 :root{
-    --colorNaranjaClaro: #fd5035;
+    --colorNaranjaClaro: #f79b3e;
     --colorCrisFondo: #f2f3f2;
 }
 body{
     background: var(--colorCrisFondo);
+}
+.logo img{
+    width: 150px;
+    position: relative;
+    top: 10px;
+    left: 10px;
 }
 /* Style main */
 .nav a{
@@ -29,6 +35,7 @@ body{
     background: var(--colorNaranjaClaro);
     color: aliceblue;
     margin-right: 6%;
+    font-weight: bold;
 }
 .boton-verMenu-cont{
     display: flex;
@@ -76,7 +83,7 @@ body{
     width: 120px;
     height: 120px;
     position: relative;
-    top: -70px;
+    top: -50px;
     right: -15px;
 
 }
