@@ -1,0 +1,60 @@
+
+
+:root{
+    --colorNaranjaClaro: #fd5035;
+    --colorCrisFondo: #f2f3f2;
+}
+body{
+    background: var(--colorCrisFondo);
+}
+/* Style main */
+.nav a{
+    color: black;
+}
+.nav a:hover{
+    color: var(--colorNaranjaClaro);
+}
+.container-main{
+    /* border: solid 3px red; */
+    width: 85%;
+    margin: auto;
+    background: var(--colorCrisFondo);
+}
+.img-main{
+    width: 50%;
+    height: 50%;
+}
+.text-salchipapa{
+    color: var(--colorNaranjaClaro);
+}
+.btn-verMenu{
+    background: var(--colorNaranjaClaro);
+    color: aliceblue;
+    margin-right: 6%;
+}
+.boton-verMenu-cont{
+    display: flex;
+    align-items: center;
+}
+.cont-card-product{
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding-top: 4%;
+}
+.card-product{
+    border-radius: 15px;
+    box-shadow: #8f8f8f 1px 1px 2px;
+    display: flex;
+    background: white;
+}
+.card-product p{
+    margin: 0;
+}
+.card-product img{
+    width: 95px;
+    height: 95px;
+    position: relative;
+    top: -20px;
+    right: -5px;
+}
