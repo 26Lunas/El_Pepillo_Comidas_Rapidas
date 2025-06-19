@@ -140,3 +140,14 @@ body{
     background: linear-gradient(90deg, #fd5035 60%, #f79b3e 100%);
     color: #fff;
 }
+
+/* Estilo para video vertical */
+.ratio-vertical {
+    --bs-aspect-ratio: 200%; /* Aumentado de 177.77% para más altura */
+    max-width: 320px; /* Ancho máximo para que no se estire en pantallas grandes */
+    margin: auto; /* Centrar el contenedor del video */
+}
+
+.ratio-vertical video {
+    object-fit: cover; /* Evita que el video se deforme */
+}
