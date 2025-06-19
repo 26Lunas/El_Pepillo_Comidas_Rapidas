@@ -12,11 +12,37 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     };
 
+    const isWorkingHours = () => {
+        const now = new Date();
+        const day = now.getDay(); // Domingo: 0, Sábado: 6
+        const hour = now.getHours(); // 0-23
+
+        // Sábado de 7:00 p.m. a 11:59 p.m.
+        if (day === 6 && hour >= 19) return true;
+        
+        // Domingo de 12:00 a.m. a 12:59 a.m. (es decir, hora 0)
+        // O Domingo de 7:00 p.m. a 11:59 p.m.
+        if (day === 0 && (hour === 0 || hour >= 19)) return true;
+        
+        // Lunes de 12:00 a.m. a 12:59 a.m. (para cubrir el cierre del domingo)
+        if (day === 1 && hour === 0) return true;
+
+        return false;
+    };
+
     const initModalLogic = () => {
         let modalPedido = null;
-        if (window.bootstrap && document.getElementById('modalPedido')) {
-            modalPedido = new bootstrap.Modal(document.getElementById('modalPedido'));
+        let closedModal = null;
+
+        if (window.bootstrap) {
+            if (document.getElementById('modalPedido')) {
+                modalPedido = new bootstrap.Modal(document.getElementById('modalPedido'));
+            }
+            if (document.getElementById('closedModal')) {
+                closedModal = new bootstrap.Modal(document.getElementById('closedModal'));
+            }
         }
+        
         let productoActual = {};
 
         function actualizarTarjetaPedido() {
@@ -64,6 +90,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
         document.body.addEventListener('click', function (e) {
             if (e.target.classList.contains('btn-pedir')) {
+                if (!isWorkingHours()) {
+                    if (closedModal) closedModal.show();
+                    return;
+                }
+
                 const btn = e.target;
                 productoActual = {
                     nombre: btn.getAttribute('data-producto'),
@@ -130,7 +161,8 @@ document.addEventListener("DOMContentLoaded", function () {
     Promise.all([
         fetchComponent('components/navbar.html', 'menu-nav'),
         fetchComponent('components/footer.html', 'footer'),
-        fetchComponent('components/modal.html', 'modal-container')
+        fetchComponent('components/modal.html', 'modal-container'),
+        fetchComponent('components/closed-modal.html', 'closed-modal-container')
     ])
     .then(initModalLogic)
     .catch(error => console.error("Error al inicializar la página:", error));
