@@ -41,6 +41,11 @@ body{
     display: flex;
     align-items: center;
 }
+.btn-verMenu:hover{
+    border: solid 1px var(--colorNaranjaClaro);
+    background: none;
+    color: var(--colorNaranjaClaro);
+}
 .cont-card-product{
     display: flex;
     align-items: center;
@@ -52,9 +57,10 @@ body{
 .card-product{
     border-radius: 15px;
     display: flex;
+    flex-direction: row;
     background: white;
     padding: 15px;
-    min-width: 200px;
+    width: 240px;
     height: 125px;
     margin-bottom: 20px;
 }
