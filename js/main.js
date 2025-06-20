@@ -35,53 +35,87 @@ document.addEventListener("DOMContentLoaded", function () {
         let closedModal = null;
 
         if (window.bootstrap) {
-            if (document.getElementById('modalPedido')) {
-                modalPedido = new bootstrap.Modal(document.getElementById('modalPedido'));
+            const modalEl = document.getElementById('modalPedido');
+            if (modalEl) {
+                modalPedido = new bootstrap.Modal(modalEl);
             }
-            if (document.getElementById('closedModal')) {
-                closedModal = new bootstrap.Modal(document.getElementById('closedModal'));
+            const closedModalEl = document.getElementById('closedModal');
+            if (closedModalEl) {
+                closedModal = new bootstrap.Modal(closedModalEl);
             }
         }
         
         let productoActual = {};
 
         function actualizarTarjetaPedido() {
-            const nombre = productoActual.nombre;
+            if (!productoActual || !document.getElementById('pedidoVariante')) {
+                return;
+            }
+
+            // Producto principal y su cantidad
             const varianteSelect = document.getElementById('pedidoVariante');
             const varianteSeleccionada = varianteSelect.value ? JSON.parse(varianteSelect.value) : null;
-            const precioBase = varianteSeleccionada ? varianteSeleccionada.precio : Number(productoActual.precio);
-            const nombreCompleto = varianteSeleccionada ? varianteSeleccionada.nombre : nombre;
-            const img = productoActual.img;
-            const checks = document.querySelectorAll('.adicionales-check:checked');
-            let adicionales = [];
-            let adicionalesTotal = 0;
-            checks.forEach(chk => {
-                adicionales.push(chk.value);
-                adicionalesTotal += Number(chk.getAttribute('data-precio'));
+            const cantidadInput = document.getElementById('pedidoCantidad');
+            const cantidad = parseInt(cantidadInput.value, 10) || 1;
+            const precioBase = varianteSeleccionada ? varianteSeleccionada.precio : 0;
+            const totalProducto = precioBase * cantidad;
+
+            // Adicionales con cantidad
+            let totalAdicionales = 0;
+            let adicionalesText = [];
+            document.querySelectorAll('.quantity-additional').forEach(additionalGroup => {
+                const input = additionalGroup.querySelector('.additional-quantity-input');
+                let additionalQty = parseInt(input.value, 10);
+                if (isNaN(additionalQty) || additionalQty < 0) additionalQty = 0;
+                // Lógica para que los adicionales no superen la cantidad del producto
+                if (additionalQty > cantidad) {
+                    additionalQty = cantidad;
+                    input.value = cantidad;
+                }
+                if (additionalQty > 0) {
+                    const price = Number(additionalGroup.dataset.price);
+                    const name = additionalGroup.dataset.name;
+                    totalAdicionales += additionalQty * price;
+                    adicionalesText.push(`${additionalQty} ${name}(s)`);
+                }
             });
-            const comentarios = document.getElementById('pedidoComentarios').value.trim();
-            document.getElementById('pedidoCardImg').src = img;
-            document.getElementById('pedidoCardNombre').textContent = nombre;
+
+            // Precio total final
+            const total = totalProducto + totalAdicionales;
+
+            // Actualizar vista de la tarjeta
+            document.getElementById('pedidoCardImg').src = productoActual.img;
+            document.getElementById('pedidoCardNombre').textContent = productoActual.nombre;
             document.getElementById('pedidoCardPrecio').textContent = varianteSeleccionada ? '$' + precioBase.toLocaleString() : 'Selecciona una opción';
+            
             const adicionalesEl = document.getElementById('pedidoCardAdicionales');
-            if (adicionales.length > 0) {
+            if (adicionalesText.length > 0) {
                 adicionalesEl.classList.remove('d-none');
-                document.getElementById('pedidoCardAdicionalesList').textContent = adicionales.join(', ');
+                document.getElementById('pedidoCardAdicionalesList').textContent = adicionalesText.join(', ');
             } else {
                 adicionalesEl.classList.add('d-none');
             }
+
             const comentariosEl = document.getElementById('pedidoCardComentarios');
-            if (comentarios) {
-                comentariosEl.textContent = comentarios;
+            if (productoActual.comentarios) {
+                comentariosEl.textContent = productoActual.comentarios;
                 comentariosEl.classList.remove('d-none');
             } else {
                 comentariosEl.classList.add('d-none');
             }
-            const total = precioBase + adicionalesTotal;
-            document.getElementById('pedidoCardTotal').textContent = varianteSeleccionada ? 'Total: $' + total.toLocaleString() : '';
-            document.getElementById('pedidoProducto').value = nombreCompleto;
+            
+            const totalEl = document.getElementById('pedidoCardTotal');
+            if (varianteSeleccionada) {
+                totalEl.textContent = `Total: $${total.toLocaleString()}`;
+            } else {
+                totalEl.textContent = '';
+            }
+
+            // Guardar en campos ocultos
+            document.getElementById('pedidoProducto').value = varianteSeleccionada ? varianteSeleccionada.nombre : productoActual.nombre;
             document.getElementById('pedidoPrecio').value = total;
-            document.getElementById('pedidoImg').value = img;
+            document.getElementById('pedidoImg').value = productoActual.img;
+            
             const form = document.getElementById('formPedido');
             form.querySelectorAll('input, textarea, button, select').forEach(input => {
                 input.disabled = !varianteSeleccionada;
@@ -89,6 +123,48 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         document.body.addEventListener('click', function (e) {
+            const isMainQuantityButton = e.target.closest('.quantity-selector') && e.target.closest('.quantity-selector').querySelector('#pedidoCantidad');
+            const isAdditionalQuantityButton = e.target.closest('.quantity-additional');
+
+            // --- Controlador Unificado de Cantidad ---
+            if (isMainQuantityButton || isAdditionalQuantityButton) {
+                let input, currentValue, action;
+                
+                if (isMainQuantityButton && !isAdditionalQuantityButton) {
+                    // Es el selector del producto principal
+                    input = document.getElementById('pedidoCantidad');
+                    action = e.target.dataset.action;
+                } else if (isAdditionalQuantityButton) {
+                    // Es un selector de adicional
+                    const group = e.target.closest('.quantity-additional');
+                    input = group.querySelector('.additional-quantity-input');
+                    action = e.target.closest('.btn-quantity-additional').dataset.action;
+                }
+
+                if (input) {
+                    currentValue = parseInt(input.value, 10);
+                    const mainQty = parseInt(document.getElementById('pedidoCantidad').value, 10);
+
+                    if (action === 'increase') {
+                        // El principal no tiene límite, los adicionales sí
+                        if (isMainQuantityButton && !isAdditionalQuantityButton) {
+                            currentValue++;
+                        } else if (isAdditionalQuantityButton && currentValue < mainQty) {
+                            currentValue++;
+                        }
+                    } else if (action === 'decrease') {
+                        // El principal no baja de 1, los adicionales no bajan de 0
+                        const limit = (isMainQuantityButton && !isAdditionalQuantityButton) ? 1 : 0;
+                        if (currentValue > limit) {
+                            currentValue--;
+                        }
+                    }
+                    input.value = currentValue;
+                    actualizarTarjetaPedido();
+                    return; // Importante para no interferir con otros clics
+                }
+            }
+
             if (e.target.classList.contains('btn-pedir')) {
                 if (!isWorkingHours()) {
                     if (closedModal) closedModal.show();
@@ -100,7 +176,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     nombre: btn.getAttribute('data-producto'),
                     precio: btn.getAttribute('data-precio'),
                     img: btn.getAttribute('data-img'),
-                    variantes: JSON.parse(btn.getAttribute('data-variantes'))
+                    variantes: JSON.parse(btn.getAttribute('data-variantes')),
+                    comentarios: btn.getAttribute('data-comentarios')
                 };
                 const varianteSelect = document.getElementById('pedidoVariante');
                 varianteSelect.innerHTML = '<option value="">Selecciona una opción</option>';
@@ -111,8 +188,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.getElementById('pedidoConfirmacion').classList.add('d-none');
                 document.querySelectorAll('.adicionales-check').forEach(chk => chk.checked = false);
                 document.getElementById('pedidoCard').classList.remove('d-none');
-                actualizarTarjetaPedido();
-                if (modalPedido) modalPedido.show();
+                if (modalPedido) {
+                    modalPedido.show();
+                    setTimeout(actualizarTarjetaPedido, 150);
+                }
+                document.getElementById('pedidoCantidad').value = '1'; // Resetea la cantidad
+                document.getElementById('pedidoGratinadoCantidad').value = '0'; // Resetea gratinado
+                document.querySelectorAll('.additional-quantity-input').forEach(input => input.value = '0'); // Resetea todos los adicionales
             }
         });
 
@@ -131,29 +213,55 @@ document.addEventListener("DOMContentLoaded", function () {
         document.body.addEventListener('submit', function (e) {
             if (e.target.id === 'formPedido') {
                 e.preventDefault();
+
                 const nombre = document.getElementById('pedidoNombre').value;
                 const celular = document.getElementById('pedidoCelular').value;
                 const direccion = document.getElementById('pedidoDireccion').value;
-                const comentarios = document.getElementById('pedidoComentarios').value;
+                const comentarios = document.getElementById('pedidoComentarios').value.trim();
                 const producto = document.getElementById('pedidoProducto').value;
-                const precio = document.getElementById('pedidoPrecio').value;
-                const checks = document.querySelectorAll('.adicionales-check:checked');
-                let adicionales = [];
-                checks.forEach(chk => adicionales.push(chk.value));
-                let mensaje = `¡Hola! Quiero pedir:\n\n*Producto:* ${producto}\n`;
-                if (adicionales.length > 0) mensaje += `*Adicionales:* ${adicionales.join(', ')}\n`;
-                mensaje += `*Total a pagar:* $${Number(precio).toLocaleString()}\n`;
-                if (comentarios) mensaje += `*Comentarios:* ${comentarios}\n`;
-                mensaje += `\n*Datos de entrega:*\nNombre: ${nombre}\nCelular: ${celular}\nDirección: ${direccion}`;
+                const precioTotal = document.getElementById('pedidoPrecio').value;
+                const cantidad = document.getElementById('pedidoCantidad').value;
+                
+                // --- Mensaje de WhatsApp Mejorado ---
+                let mensaje = `¡Hola! Quiero hacer un pedido:\n\n`;
+                mensaje += `*${cantidad}x ${producto}*\n\n`;
+
+                let adicionalesMsg = [];
+                document.querySelectorAll('.quantity-additional').forEach(group => {
+                    const qty = parseInt(group.querySelector('.additional-quantity-input').value, 10);
+                    if (qty > 0) {
+                        adicionalesMsg.push(`- ${qty} ${group.dataset.name}(s)`);
+                    }
+                });
+
+                if (adicionalesMsg.length > 0) {
+                    mensaje += `*Adicionales:*\n${adicionalesMsg.join('\n')}\n\n`;
+                }
+                
+                if (comentarios) {
+                    mensaje += `*Comentarios:*\n${comentarios}\n\n`;
+                }
+
+                mensaje += `*Total a pagar:* $${Number(precioTotal).toLocaleString()}\n\n`;
+                mensaje += `*Datos de entrega:*\n`;
+                mensaje += `- Nombre: ${nombre}\n`;
+                mensaje += `- Celular: ${celular}\n`;
+                mensaje += `- Dirección: ${direccion}`;
+                // --- Fin del Mensaje Mejorado ---
+                
                 const numero = '573152854277';
                 const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
                 window.open(url, '_blank');
+
                 const confirmacion = document.getElementById('pedidoConfirmacion');
-                confirmacion.innerHTML = `<strong>¡Pedido enviado!</strong><br><img src="${productoActual.img}" alt="${producto}" style="width:80px;display:block;margin:10px auto;"/><br>${producto} - $${Number(precio).toLocaleString()}<br>Gracias, ${nombre}. Nos contactaremos pronto.`;
+                confirmacion.innerHTML = `<strong>¡Pedido enviado!</strong><br><img src="${productoActual.img}" alt="${producto}" style="width:80px;display:block;margin:10px auto;"/><br>${producto} - $${Number(precioTotal).toLocaleString()}<br>Gracias, ${nombre}. Nos contactaremos pronto.`;
                 confirmacion.classList.remove('d-none');
-                setTimeout(() => {
-                    if (modalPedido) modalPedido.hide();
-                }, 3000);
+                
+                if (modalPedido) {
+                    setTimeout(() => {
+                        modalPedido.hide();
+                    }, 3000);
+                }
             }
         });
     };

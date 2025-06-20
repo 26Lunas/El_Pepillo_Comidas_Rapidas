@@ -151,3 +151,16 @@ body{
 .ratio-vertical video {
     object-fit: cover; /* Evita que el video se deforme */
 }
+
+/* Estilos para el selector de cantidad */
+.quantity-selector {
+    max-width: 130px; /* Ancho máximo del componente */
+}
+.quantity-selector .form-control {
+    background-color: #fff; /* Asegura fondo blanco aunque sea readonly */
+    font-weight: bold;
+}
+.quantity-selector .btn-quantity {
+    border-color: #ced4da;
+    font-weight: bold;
+}
