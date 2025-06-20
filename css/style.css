@@ -64,6 +64,27 @@ body{
     height: 125px;
     margin-bottom: 20px;
 }
+.cont-img-btn{
+    display: flex;
+    flex-direction: column;
+}
+.card-product .btn-pedir{
+    position: relative;
+    top: -35px;
+}
+.card-product .btn-pedir-hamburguesa{
+    position: relative;
+    top: -35px;
+}
+@media (max-width: 588px) {
+    .card-product{
+        width: 280px;
+    }
+    .card-product .btn-pedir{
+        position: relative;
+        left: -0px;
+    }
+}
 
 .card-product p{
     margin: 0;
@@ -82,7 +103,7 @@ body{
     width: 120px;
     height: 120px;
     position: relative;
-    top: -45px;
+    top: -55px;
 
 }
 .card-product .img-asados{
@@ -98,10 +119,7 @@ body{
     border: 3px solid var(--colorNaranjaClaro);
     background: #fff;
 }
-.card-product .btn-pedir{
-    position: relative;
-    left: -35px;
-}
+
 #pedidoCardNombre {
     font-size: 1.3rem;
     color: #222;
