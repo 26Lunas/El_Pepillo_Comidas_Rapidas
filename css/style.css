@@ -73,8 +73,9 @@ body{
     top: -35px;
 }
 .card-product .btn-pedir-hamburguesa{
+    /* border: solid 1px var(--colorNaranjaClaro); */
     position: relative;
-    top: -35px;
+    top: -53px;
 }
 @media (max-width: 588px) {
     .card-product{
