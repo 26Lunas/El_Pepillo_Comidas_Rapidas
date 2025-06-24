@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Lunes de 12:00 a.m. a 12:59 a.m. (para cubrir el cierre del domingo)
         if (day === 1 && hour === 0) return true;
 
-        return false;
+        return true;
     };
 
     const initModalLogic = () => {
